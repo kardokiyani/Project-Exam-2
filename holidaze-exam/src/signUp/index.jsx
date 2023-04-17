@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 
-const API_BASE = "https://api.noroff.dev/api/v1/holidaze/auth/register";
+import { Container, Form, Button, Alert } from "react-bootstrap";
+
+const API_REGISTER = "https://api.noroff.dev/api/v1/holidaze/auth/register";
 
 export function SignUp() {
   const [isLoading, setIsLoading] = useState(false);
@@ -14,9 +16,15 @@ export function SignUp() {
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
+      // Check if email is valid
+      const isNoroffEmail = formData.email.endsWith("@stud.noroff.no");
+      if (!isNoroffEmail) {
+        setIsError("Only @stud.noroff.no emails are allowed to register.");
+        return;
+      }
       setIsError(false);
       setIsLoading(true);
-      const response = await fetch(API_BASE, {
+      const response = await fetch(API_REGISTER, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -31,7 +39,7 @@ export function SignUp() {
       setIsLoading(false);
       setIsError(true);
     }
-  };
+  }; 
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -42,41 +50,52 @@ export function SignUp() {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <label>
-        Name:
-        <input
-          type="text"
-          name="name"
-          value={formData.name}
-          onChange={handleChange}
-        />
-      </label>
-      <br />
-      <label>
-        Email:
-        <input
-          type="email"
-          name="email"
-          value={formData.email}
-          onChange={handleChange}
-        />
-      </label>
-      <br />
-      <label>
-        Password:
-        <input
-          type="password"
-          name="password"
-          value={formData.password}
-          onChange={handleChange}
-        />
-      </label>
-      <br />
-      <button type="submit">Register</button>
+    <Container className="register-container">
+      <h1>Sign Up</h1>
+      {isError && <Alert variant="danger">Error loading data</Alert>}
+      <Form onSubmit={handleSubmit}>
+        <Form.Group controlId="formBasicName">
+          <Form.Label>Name</Form.Label>
+          <Form.Control
+            className="form-control"
+            type="text"
+            placeholder="Enter name"
+            name="name"
+            value={formData.name}
+            onChange={handleChange}
+          />
+        </Form.Group>
+
+        <Form.Group controlId="formBasicEmail">
+          <Form.Label>Email address</Form.Label>
+          <Form.Control
+            className="form-control"
+            type="email"
+            placeholder="Enter email"
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
+          />
+        </Form.Group>
+
+        <Form.Group controlId="formBasicPassword">
+          <Form.Label>Password</Form.Label>
+          <Form.Control
+            className="form-control"
+            type="password"
+            placeholder="Password"
+            name="password"
+            value={formData.password}
+            onChange={handleChange}
+          />
+        </Form.Group>
+
+        <Button className="submit-btn" variant="primary" type="submit">
+          Register
+        </Button>
+      </Form>
       {isLoading && <div>Loading data</div>}
-      {isError && <div>Error loading data</div>}
-    </form>
+    </Container>
   );
 }
 
